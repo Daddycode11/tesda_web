@@ -12,23 +12,25 @@ class AnnouncementController extends Controller
         $announcements = Announcement::latest()->get();
         return view('admin.announcements.index', compact('announcements'));
     }
+public function create()
+{
+    return view('admin.announcements.create');
+}
 
-    public function create()
-    {
-        return view('admin.announcements.create');
-    }
+public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+    ]);
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
+    \App\Models\Announcement::create([
+        'title' => $request->title,
+        'content' => $request->content,
+    ]);
 
-        Announcement::create($request->all());
-
-        return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
-    }
+    return redirect()->route('announcements.index')->with('success', 'Announcement created successfully!');
+}
 
     public function edit(Announcement $announcement)
     {

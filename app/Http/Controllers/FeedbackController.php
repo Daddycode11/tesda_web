@@ -43,9 +43,10 @@ class FeedbackController extends Controller
     }
 
     // Admin: list all feedback
-    public function index()
+
+ public function index()
     {
-        $feedback = Feedback::with('user', 'service')->latest()->get();
+        $feedback = Feedback::all();
         return view('admin.feedback.index', compact('feedback'));
     }
 
