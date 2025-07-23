@@ -15,12 +15,23 @@ class UserDashboardController extends Controller
     {
         return view('user.dashboard', [
             'totalServices' => Service::count(),
+
+            // Enrollments specific to logged in user
             'myEnrollmentsCount' => Enrollment::where('user_id', Auth::id())->count(),
             'approvedEnrollmentsCount' => Enrollment::where('user_id', Auth::id())->where('status', 'approved')->count(),
+
+            // Latest items for dashboard cards or lists
             'services' => Service::latest()->take(5)->get(),
-            'myEnrollments' => Enrollment::with('schedule')->where('user_id', Auth::id())->latest()->take(5)->get(),
-            'myFeedback' => Feedback::where('user_id', Auth::id())->latest()->take(5)->get(),
-            'announcements' => Announcement::latest()->take(5)->get(), // ✅ fetch announcements
+            'myEnrollments' => Enrollment::with('schedule')
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->take(5)
+                ->get(),
+            'myFeedback' => Feedback::where('user_id', Auth::id())
+                ->latest()
+                ->take(5)
+                ->get(),
+            'announcements' => Announcement::latest()->take(5)->get(),
         ]);
     }
 }

@@ -33,7 +33,13 @@
             <span class="mr-2">💬</span>
             <span>My Feedback</span>
         </a>
-
+    {{-- ✅ New: My TESDA Requests --}}
+    <a href="{{ route('user.requests.index') }}" 
+       class="flex items-center px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('user.requests.index') ? 'bg-gray-900' : '' }}">
+        <span class="mr-2">📋</span>
+        <span>My Requests</span>
+    </a>
+    
 {{-- ✅ New: Messages nav item (no real route yet) --}}
 <a href="#"
    class="flex items-center px-4 py-2 rounded hover:bg-gray-700">

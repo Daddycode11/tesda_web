@@ -43,11 +43,25 @@ class FeedbackController extends Controller
     }
 
     // Admin: list all feedback
-
- public function index()
+    public function index()
     {
-        $feedback = Feedback::all();
+        $feedback = Feedback::with(['user', 'service'])->get()->map(function ($item) {
+            // add virtual properties for Blade
+            $item->type = $item->service_id ? 'Service Feedback' : 'General Feedback';
+            $item->text = $item->comment ?: $item->content;
+            return $item;
+        });
+
         return view('admin.feedback.index', compact('feedback'));
+    }
+
+    // Admin: approve feedback
+    public function approve(Feedback $feedback)
+    {
+        $feedback->status = 'view';
+        $feedback->save();
+
+        return back()->with('success', 'Feedback approved!');
     }
 
     // Admin: delete feedback

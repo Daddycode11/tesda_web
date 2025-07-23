@@ -3,7 +3,7 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-
+// use App\Http\Middleware\AdminMiddleware;
 class Kernel extends HttpKernel
 {
     protected $middleware = [
@@ -37,9 +37,6 @@ protected $routeMiddleware = [
     'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
     'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-
-    
-    // ✅ Correct custom admin middleware
-    'admin' => \App\Http\Middleware\Admin::class,
+    // 'admin' => AdminMiddleware::class,
 ];
 }

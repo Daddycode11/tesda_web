@@ -1,4 +1,5 @@
-<x-app-layout>
+@extends('layouts.app')
+
     <div class="flex min-h-screen bg-white">
         {{-- Sidebar --}}
         @include('components.user-sidebar')
@@ -34,4 +35,3 @@
             </div>
         </div>
     </div>
-</x-app-layout>

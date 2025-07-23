@@ -1,4 +1,5 @@
-<x-app-layout>
+@extends('layouts.app')
+
     <div class="flex flex-wrap">
         {{-- Sidebar --}}
         @include('components.admin-sidebar')
@@ -50,4 +51,3 @@
             @endif
         </div>
     </div>
-</x-app-layout>

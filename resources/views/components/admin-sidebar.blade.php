@@ -23,10 +23,10 @@
            class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('enrollments.*') ? 'bg-gray-900' : '' }}">
             📝 Enrollments
         </a>
-        <a href="{{ route('feedback.index') }}" 
-           class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('feedback.*') ? 'bg-gray-900' : '' }}">
-            💬 Feedback
-        </a>
+      <a href="{{ route('feedback.index') }}" 
+   class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('feedback.*') ? 'bg-gray-900' : '' }}">
+    💬 Feedback
+</a>
     </nav>
     <form method="POST" action="{{ route('logout') }}" class="mt-4 border-t border-gray-700">
         @csrf

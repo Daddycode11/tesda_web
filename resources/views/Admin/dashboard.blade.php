@@ -1,4 +1,5 @@
-<x-app-layout>
+@extends('layouts.app')
+
     <div class="flex">
         {{-- Sidebar --}}
         @include('components.admin-sidebar')
@@ -14,12 +15,12 @@
             <p class="text-3xl font-bold">{{ $totalServices ?? 0 }}</p>
         </div>
     </div>
-    <div class="bg-green-500 text-white p-6 rounded-lg shadow text-center">
-        <div class="flex flex-col items-center"> {{-- inner card --}}
-            <h2 class="text-lg">Total Feedback</h2>
-            <p class="text-3xl font-bold">{{ $totalFeedback ?? 0 }}</p>
-        </div>
+<div class="bg-green-500 text-white p-6 rounded-lg shadow text-center">
+    <div class="flex flex-col items-center">
+        <h2 class="text-lg">Total Feedback Submitted</h2>
+        <p class="text-3xl font-bold">{{ $totalFeedback ?? 0 }}</p>
     </div>
+</div>
     <div class="bg-purple-500 text-white p-6 rounded-lg shadow text-center">
         <div class="flex flex-col items-center"> {{-- inner card --}}
             <h2 class="text-lg">Total Schedules</h2>
@@ -28,8 +29,8 @@
     </div>
     <div class="bg-yellow-500 text-white p-6 rounded-lg shadow text-center">
         <div class="flex flex-col items-center"> {{-- inner card --}}
-            <h2 class="text-lg">Total Enrollments</h2>
-            <p class="text-3xl font-bold">{{ $totalEnrollments ?? 0 }}</p>
+            <h2 class="text-lg">Total Request</h2>
+            <p class="text-3xl font-bold">{{ $totalrequest ?? 0 }}</p>
         </div>
     </div>
     </div>
@@ -49,50 +50,72 @@
             <canvas id="ganttChart"></canvas>
         </div>
     </div>
+<div class="bg-white p-4 rounded-xl shadow flex flex-col">
+    <h2 class="text-lg font-semibold text-center mb-4 text-gray-800 flex items-center justify-center">
+        New Requests
+        @if($newRequests->count() > 0)
+            <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                {{ $newRequests->count() }}
+            </span>
+        @endif
+    </h2>
 
-    {{-- Right side: New Requests card --}}
-    <div class="bg-white p-4 rounded-xl shadow flex flex-col">
-        <h2 class="text-lg font-semibold text-center mb-4 text-gray-800">New Requests</h2>
-
-        <div class="flex-1 space-y-3 overflow-y-auto">
+    <div class="flex-1 space-y-3 overflow-y-auto">
+        @forelse($newRequests as $req)
             <div class="bg-gray-50 p-3 rounded flex items-center justify-between hover:bg-gray-100">
                 <div class="text-sm">
-                    <div class="font-medium text-blue-600">New Form request</div>
-                    <div class="text-xs text-gray-500">From: Jowel Paña</div>
+                    <div class="font-medium text-blue-600">
+                        New {{ $req->request_type }} request
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        From: {{ $req->name }}
+                    </div>
                 </div>
-                <button class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition">
-                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 3a1 1 0 011 1v5h5a1 1 0 010 2h-5v5a1 1 0 01-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                    </svg>
-                </button>
+                <form action="{{ route('admin.tesda_requests.updateStatus', $req->id) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="Approved">
+                    <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition" title="Approve">
+                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 3a1 1 0 011 1v5h5a1 1 0 010 2h-5v5a1 1 0 01-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
-
-            <div class="bg-gray-50 p-3 rounded flex items-center justify-between hover:bg-gray-100">
-                <div class="text-sm">
-                    <div class="font-medium text-blue-600">New National Certificate request</div>
-                    <div class="text-xs text-gray-500">From: Gail</div>
-                </div>
-                <button class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition">
-                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 3a1 1 0 011 1v5h5a1 1 0 010 2h-5v5a1 1 0 01-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="bg-gray-50 p-3 rounded flex items-center justify-between hover:bg-gray-100">
-                <div class="text-sm">
-                    <div class="font-medium text-blue-600">New Record request</div>
-                    <div class="text-xs text-gray-500">From: John Doe</div>
-                </div>
-                <button class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition">
-                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 3a1 1 0 011 1v5h5a1 1 0 010 2h-5v5a1 1 0 01-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
+        @empty
+            <p class="text-gray-500 text-center">No new requests.</p>
+        @endforelse
     </div>
 </div>
+
+<div class="bg-white p-4 rounded-xl shadow flex flex-col">
+    <h2 class="text-lg font-semibold text-center mb-4 text-gray-800 flex items-center justify-center">
+        Approved Requests
+        @if($approvedRequests->count() > 0)
+            <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                {{ $approvedRequests->count() }}
+            </span>
+        @endif
+    </h2>
+
+    <div class="flex-1 space-y-3 overflow-y-auto">
+        @forelse($approvedRequests as $req)
+            <div class="bg-gray-50 p-3 rounded flex items-start justify-between hover:bg-gray-100">
+                <div class="text-sm">
+                    <div class="font-medium text-green-600">
+                        Approved {{ $req->request_type }} request
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        From: {{ $req->name }}
+                    </div>
+                </div>
+                {{-- Optional actions like view or delete can go here --}}
+            </div>
+        @empty
+            <p class="text-gray-500 text-center">No approved requests yet.</p>
+        @endforelse
+    </div>
+
+
     {{-- Chart.js CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -153,4 +176,4 @@
             }
         });
     </script>
-</x-app-layout>
+

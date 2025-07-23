@@ -10,23 +10,33 @@ use App\Models\Announcement;
 
 class AdminDashboardController extends Controller
 {
-    public function index()
-    {
-        // Just for example; replace with real DB groupBy later
-        $monthlyData = [
-            'months' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            'services'     => [5, 8, 7, 10, 9, 12],
-            'feedback'     => [3, 5, 4, 6, 5, 7],
-            'schedules'    => [2, 3, 3, 4, 3, 5],
-            'enrollments'  => [4, 6, 5, 8, 7, 9]
-        ];
+ public function index()
+{
+    // Monthly data example (keep yours)
+    $monthlyData = [
+        'months'       => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        'services'     => [5, 8, 7, 10, 9, 12],
+        'feedback'     => [3, 5, 4, 6, 5, 7],
+        'schedules'    => [2, 3, 3, 4, 3, 5],
+        'enrollments'  => [4, 6, 5, 8, 7, 9]
+    ];
 
-        return view('admin.dashboard', [
-            'totalServices' => Service::count(),
-            'totalFeedback' => Feedback::count(),
-            'totalSchedules' => Schedule::count(),
-            'totalEnrollments' => Enrollment::count(),
-            'monthlyData' => $monthlyData   // ✅ pass to view
-        ]);
-    }
+    // Total counts
+    $totalFeedback         = \App\Models\Feedback::count();
+    $pendingFeedbackCount  = \App\Models\Feedback::where('status', 'pending')->count();
+    $approvedFeedbackCount = \App\Models\Feedback::where('status', 'view')->count();
+    $rejectedFeedbackCount = \App\Models\Feedback::where('status', 'rejected')->count(); // optional if you have this status
+
+    return view('admin.dashboard', [
+        'totalServices'          => \App\Models\Service::count(),
+        'totalFeedback'         => $totalFeedback,
+        'pendingFeedbackCount'  => $pendingFeedbackCount,
+        'approvedFeedbackCount' => $approvedFeedbackCount,
+        'rejectedFeedbackCount' => $rejectedFeedbackCount,
+        'totalSchedules'        => \App\Models\Schedule::count(),
+        'totalEnrollments'      => \App\Models\Enrollment::count(),
+        'monthlyData'           => $monthlyData,
+    ]);
+}
+
 }
