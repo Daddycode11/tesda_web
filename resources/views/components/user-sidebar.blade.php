@@ -39,14 +39,13 @@
         <span class="mr-2">📋</span>
         <span>My Requests</span>
     </a>
-    
-{{-- ✅ New: Messages nav item (no real route yet) --}}
-<a href="#"
-   class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+
+{{-- ✅ New: Messages nav item --}}
+<a href="{{ route('chat.index') }}"
+   class="flex items-center px-4 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('chat.index') ? 'bg-gray-900' : '' }}">
     <span class="mr-2">📩</span>
     <span>Messages</span>
 </a>
-
     </nav>
 
     <form method="POST" action="{{ route('logout') }}" class="mt-4 border-t border-gray-700">

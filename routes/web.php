@@ -14,6 +14,8 @@ use App\Models\Service;
 use App\Models\Feedback;
 use App\Http\Controllers\TesdaRequestController;
 use App\Http\Controllers\Admin\TesdaRequestController as AdminTesdaRequestController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 
 
 /*
@@ -54,6 +56,8 @@ Route::middleware('role:user')->group(function () {
     Route::get('/user', [UserDashboardController::class, 'index'])->name('user.dashboard');
 
 });
+Route::view('/mission', 'mission')->name('mission');
+Route::view('/vision', 'vision')->name('vision');
 
 /*
 |--------------------------------------------------------------------------
@@ -61,15 +65,10 @@ Route::middleware('role:user')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-// Eto nilabas sa middleware guamana naman, pero walang data sya saka nav-tapos naka fill sa cnter
-// what if yung isa ang i open yung old, tas paano mo sya napa run - ito bago? oo kasi yun problema sa luma eh
-//tka may problema ata sa welcome template 
 // Route::get('/admin', function () {
 //     return view('admin.dashboard');
 // })->name('admin.dashboard');
 
-
-// bali ganto na gagawin mo sa mga middleware
 
 Route::middleware('role:admin')->group(function () {
     Route::get('/admin', function () {
@@ -164,19 +163,40 @@ Route::get('/list-services', function () {
         $myFeedback = Feedback::where('user_id', Auth::id())->latest()->get();
         return view('user.feedback', compact('myFeedback'));
     })->name('user.feedback');
+/*
+|--------------------------------------------------------------------------
+| Chat / Messages Routes
+|--------------------------------------------------------------------------
+*/
+// 🔹 User Chat (user ↔ admin)
+Route::middleware('auth')->group(function () {
+Route::get('/chat', [MessageController::class, 'index'])->name('chat.index');
+Route::post('/chat/send', [MessageController::class, 'store'])->name('chat.send');
+
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');   
+    Route::post('/messages/send', [MessageController::class, 'store'])->name('messages.store'); 
+});
+// 🔹 Admin Chat
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'adminIndex'])->name('admin.messages.index');   // list of users
+    Route::get('/messages/{userId}', [MessageController::class, 'adminReply'])->name('admin.messages.reply'); // open chat with user
+    Route::post('/messages/{userId}/send', [MessageController::class, 'adminSend'])->name('admin.messages.send'); // reply
+});
+
 
 // User side
-Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
     Route::get('/request/create', [TesdaRequestController::class, 'create'])->name('request.create');
     Route::post('/request', [TesdaRequestController::class, 'store'])->name('request.store');
 });
 
 // Admin side
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/tesda_requests', [AdminTesdaRequestController::class, 'index'])->name('tesda_requests.index');
     Route::post('/tesda_requests/{id}/status', [AdminTesdaRequestController::class, 'updateStatus'])->name('tesda_requests.updateStatus');
 });
-Route::prefix('user')->middleware(['auth'])->group(function () {
+    Route::prefix('user')->middleware(['auth'])->group(function () {
     Route::get('/requests', [TesdaRequestController::class, 'index'])->name('user.requests.index');
     Route::get('/requests/create', [TesdaRequestController::class, 'create'])->name('user.requests.create');
     Route::post('/requests', [TesdaRequestController::class, 'store'])->name('user.requests.store');

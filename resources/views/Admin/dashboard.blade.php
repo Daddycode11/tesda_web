@@ -90,11 +90,6 @@
 <div class="bg-white p-4 rounded-xl shadow flex flex-col">
     <h2 class="text-lg font-semibold text-center mb-4 text-gray-800 flex items-center justify-center">
         Approved Requests
-        @if($approvedRequests->count() > 0)
-            <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                {{ $approvedRequests->count() }}
-            </span>
-        @endif
     </h2>
 
     <div class="flex-1 space-y-3 overflow-y-auto">
