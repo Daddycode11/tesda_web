@@ -33,6 +33,24 @@
            class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('feedback.*') ? 'bg-gray-900' : '' }}">
             💬 Feedback
         </a>
+         <!-- ✅ NEW: Transparency Management -->
+        <a href="{{ route('admin.transparency.index') }}" 
+           class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.transparency.*') ? 'bg-gray-900' : '' }}">
+            📄 Transparency
+        </a>
+<!-- Admin Sidebar -->
+<a href="{{ route('programs.index') }}" 
+   class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('programs.*') ? 'bg-gray-900' : '' }}">
+    🎯 Programs & Services
+</a>
+  <a href="{{ route('admin.careers.index') }}" 
+   class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.careers.*') ? 'bg-gray-900' : '' }}">
+    💼 Careers
+</a>
+<a href="{{ route('admin.news.index') }}" 
+   class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.news.*') ? 'bg-gray-900' : '' }}">
+   📰 News & Updates
+</a>
 
     <!-- ✅ Admin Messages link -->
 <a href="{{ route('admin.messages.index') }}" 

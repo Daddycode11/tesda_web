@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
@@ -16,7 +15,17 @@ use App\Http\Controllers\TesdaRequestController;
 use App\Http\Controllers\Admin\TesdaRequestController as AdminTesdaRequestController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
-
+use App\Http\Controllers\Admin\TransparencyController;
+use App\Http\Controllers\TransparencyPublicController;
+use App\Http\Controllers\PublicFeedbackController;
+use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\ProgramPublicController;
+use App\Http\Controllers\Admin\CareerController;
+use App\Models\Career;
+use App\Http\Controllers\CareerPublicController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\NewsPublicController;
+use App\Models\News;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,13 +33,84 @@ use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 |--------------------------------------------------------------------------
 */
 
+// Static pages
+Route::view('/history', 'nav.history');
+Route::view('/mission-vision', 'nav.mission-vision');
+Route::view('/structure', 'nav.structure');
+// Route::view('/careers', 'nav.careers');
+Route::view('/programs-services', 'nav.programs-services');
+Route::view('/contacts', 'nav.contacts');
+
+// Landing page
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+// Public transparency page
+Route::get('/transparency', [TransparencyPublicController::class, 'index'])
+    ->name('transparency.public');
+
+// Optional: public transparency submission
+Route::post('/transparency', [TransparencyPublicController::class, 'store'])
+    ->name('transparency.public.store');
+
+// Admin transparency CRUD (protected)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('transparency', TransparencyController::class);
+});
+
+// Admin Routes - Careers Management
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::resource('careers', CareerController::class)->except(['show', 'edit', 'update']);
+});
+Route::get('/careers', [CareerPublicController::class, 'index'])->name('careers.public');
+
+Route::get('/', function () {
+    $news = \App\Models\News::latest()->paginate(6); // 6 news per page
+    return view('welcome', compact('news'));
+})->name('welcome');
+
+// Landing page: display news
+Route::get('/', function () {
+    $news = News::latest()->paginate(6);
+    return view('welcome', compact('news'));
+})->name('welcome');
+// Public single news page
+Route::get('/news/{id}', [NewsPublicController::class, 'show'])->name('news.show');
+
+// Admin resource routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('news', NewsController::class);
+});
+
+// 📰 Public route to show single news
+Route::get('/news/{id}', [NewsPublicController::class, 'show'])->name('news.show');
+
+// 🔒 Admin routes (for managing news in dashboard)
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('news', NewsController::class);
+});
+/*
+|--------------------------------------------------------------------------
+| Public Feedback Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->middleware(['auth'])->group(function() {
+    Route::resource('programs', ProgramController::class);
+});
+
+Route::get('/programs-services', [ProgramPublicController::class, 'index']);
+
+Route::get('/programs-services', [ProgramPublicController::class, 'index'])->name('programs-services');
+// Protected requests
 Route::middleware(['auth'])->group(function () {
     Route::get('/request/create', [TesdaRequestController::class, 'create'])->name('request.create');
     Route::post('/request', [TesdaRequestController::class, 'store'])->name('request.store');
+});
 
     // ✅ New: view all submitted requests by this user
     Route::get('/my-requests', [TesdaRequestController::class, 'index'])->name('user.requests.index');
-});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');

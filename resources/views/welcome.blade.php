@@ -1,240 +1,149 @@
 {{-- resources/views/welcome.blade.php --}}
-
-@extends('layouts.app')
 <!-- START NAV -->
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+<nav x-data="{ open: false, loginModal: false, registerModal: false }" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-            <div class="flex">
-                <!-- Logo + Name -->
-                <div class="shrink-0 flex items-center space-x-3">
-                    <a href="{{ url('/') }}" class="flex items-center space-x-2">
-                        <img src="{{ asset('images/Tesda-Logo.png') }}" class="h-12 w-auto" alt="TESDA Logo">
-                        <span class="flex flex-col">
-                            <span class="text-lg font-semibold text-gray-800 dark:text-gray-200">TESDA</span>
-                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Occidental Mindoro</span>
-                        </span>
-                    </a>
-                </div>
+        <div class="flex justify-between items-center h-16">
+
+            <!-- Logo -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="{{ url('/') }}" class="flex items-center space-x-2">
+                    <img src="{{ asset('images/Tesda-Logo.png') }}" class="h-12 w-auto" alt="TESDA Logo">
+                    <span class="flex flex-col">
+                        <span class="text-lg font-semibold text-gray-800 dark:text-gray-200">TESDA</span>
+                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Occidental Mindoro</span>
+                    </span>
+                </a>
             </div>
-            <!-- Main Nav -->
-            <div class="hidden sm:flex sm:items-center sm:justify-center flex-1">
-                <nav class="space-x-8 text-base font-semibold text-gray-700 dark:text-gray-300">
-                    <a href="{{ url('/') }}" class="inline-flex items-center hover:text-blue-600 transition">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-9 2v7a2 2 0 002 2h4a2 2 0 002-2v-7m-6 0h6" />
+
+            <!-- Desktop Menu -->
+            <div class="hidden sm:flex sm:items-center sm:space-x-6 flex-1 justify-center">
+                <a href="{{ url('/') }}" class="inline-flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 transition font-semibold">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 12l2-2m0 0l7-7 7 7m-9 2v7a2 2 0 002 2h4a2 2 0 002-2v-7m-6 0h6" />
+                    </svg>
+                    Home
+                </a>
+
+                @php
+                    $dropdowns = [
+                        'About Us' => [
+                            ['url'=>url('/history'),'label'=>'History'],
+                            ['url'=>url('/mission-vision'),'label'=>'Mission, Vision, Value & Quality Statement'],
+                            ['url'=>url('/core-business'),'label'=>'Core Business'],
+                            ['url'=>url('/road-map'),'label'=>'Road Map'],
+                            ['url'=>url('/calendar-events'),'label'=>'Activities & Events'],
+                            ['url'=>url('/structure'),'label'=>'Organizational Structure (Provincial Office Staffs)'],
+                            ['url'=>url('/careers'),'label'=>'Careers'],
+                            ['url'=>url('/pds-corner'),'label'=>'PD\'s Corner'],
+                        ],
+                        'Programs & Services' => [
+                            ['url'=>route('programs-services'),'label'=>'TVET Programs'],
+                            ['url'=>url('/competency-standards-development'),'label'=>'Competency Standards Development'],
+                            ['url'=>url('/competency-assessment-certification'),'label'=>'Competency Assessment and Certification'],
+                            ['url'=>url('/program-registration-accreditation'),'label'=>'Program Registration and Accreditation'],
+                            ['url'=>url('/directory-schools'),'label'=>'Directory of Schools with Registered Programs'],
+                            ['url'=>url('/directory-trainers'),'label'=>'Directory of Accredited TVET Trainers'],
+                            ['url'=>url('/training-regulations'),'label'=>'Training Regulations'],
+                            ['url'=>url('/competency-standards'),'label'=>'Competency Standards'],
+                        ],
+                        'Transparency' => [
+                            ['url'=>url('/transparency-seal'),'label'=>'Transparency Seal'],
+                            ['url'=>url('/citizens-charter'),'label'=>'Citizen’s Charter'],
+                            ['url'=>url('/freedom-of-information'),'label'=>'Freedom of Information'],
+                            ['url'=>url('/philippine-qualifications-framework'),'label'=>'Philippine Qualifications Framework'],
+                            ['url'=>url('/bagong-pilipinas'),'label'=>'Bagong Pilipinas'],
+                        ],
+                        'Resources' => [
+                            ['url'=>url('/tesda-circulars'),'label'=>'TESDA Circulars (Memo, Resolutions, Advisories, Orders)'],
+                            ['url'=>url('/downloadable-files'),'label'=>'Downloadable Files (Forms and other files available for downloading)'],
+                        ],
+                        'Contacts' => [
+                            ['url'=>url('/contacts/central-office'),'label'=>'Central Office'],
+                            ['url'=>url('/contacts/regional-office'),'label'=>'Regional Office'],
+                            ['url'=>url('/contacts/occidental-mindoro-tti'),'label'=>'Occidental Mindoro TESDA Training Institute'],
+                            ['url'=>url('/contacts/ttis'),'label'=>'TTIs'],
+                            ['url'=>url('/contacts/tvis'),'label'=>'TVIs'],
+                            ['url'=>url('/contacts/board-members'),'label'=>'Board Members'],
+                        ],
+                    ];
+                @endphp
+
+                @foreach($dropdowns as $title => $links)
+                <div class="relative inline-block text-left group">
+                    <button type="button" onclick="document.getElementById('{{ Str::slug($title) }}-menu').classList.toggle('hidden');"
+                        class="inline-flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 transition font-semibold focus:outline-none">
+                        {{ $title }}
+                        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                clip-rule="evenodd" />
                         </svg>
-                        Home
-                    </a>
-                    <div class="relative inline-block text-left group">
-                        <button type="button" class="inline-flex items-center hover:text-blue-600 transition focus:outline-none" onclick="document.getElementById('about-menu').classList.toggle('hidden');">
-                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
-                            </svg>
-                            About Us
-                            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div id="about-menu" class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 hidden z-50">
-                            <div class="py-1">
-                                <a href="#" onclick="openModal('modal-history')" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">History</a>
-                                <a href="#" onclick="openModal('modal-mission')" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mission and Vision</a>
-                                <a href="#" onclick="openModal('modal-structure')" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Organizational Structure</a>
-                                <a href="#" onclick="openModal('modal-careers')" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Careers</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="relative inline-block text-left group">
-                        <button type="button" class="inline-flex items-center hover:text-blue-600 transition focus:outline-none" onclick="document.getElementById('programs-menu').classList.toggle('hidden');">
-                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 0a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2m-6 0h6" />
-                            </svg>
-                            Program & Services
-                            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div id="programs-menu" class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 hidden z-50">
-                            <div class="py-1">
-                                <!-- Program & Services button (opens modal) -->
-                                <button type="button"
-                                    class="inline-flex items-center hover:text-blue-600 transition focus:outline-none"
-                                    onclick="document.getElementById('modal-login-required').classList.remove('hidden');">
-                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 0a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2m-6 0h6" />
-                                    </svg>
-                                    Program & Services
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @auth
-                    <a href="{{ route('user.dashboard') }}"
-                        class="inline-flex items-center hover:text-blue-600 transition">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2m10-4H7a2 2 0 00-2 2v2a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2z" />
-                        </svg>
-                        Give Feedback
-                    </a>
-                    @else
-                 <a href="javascript:void(0);" 
-   onclick="document.getElementById('modal-feedback-required').classList.remove('hidden');"
-   class="inline-flex items-center hover:text-blue-600 transition">
-    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round"
-            d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2m10-4H7a2 2 0 00-2 2v2a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2z" />
-    </svg>
-    Feedback
-</a>
-                    @endauth
-                    <a href="" class="inline-flex items-center hover:text-blue-600 transition">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 10a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12h.01M12 12h.01M9 12h.01" />
-                        </svg>
-                        Contacts
-                    </a>
-                </nav>
-            </div>
-            <!-- Auth Links -->
-
-            <a href="javascript:void(0);"
-                onclick="document.getElementById('modal-login').classList.remove('hidden');"
-                class="inline-flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-800 px-4 py-2 rounded-md transition">
-                Login
-            </a>
-
-            <a href="javascript:void(0);"
-                onclick="document.getElementById('modal-register').classList.remove('hidden');"
-                class="ml-2 inline py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 rounded-md transition">
-                Register
-            </a>
-
-
-            <!-- Login Modal -->
-            <div id="modal-login" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center overflow-y-auto">
-                <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
-                    <!-- Close button -->
-                    <button onclick="document.getElementById('modal-login').classList.add('hidden');"
-                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
-                    <!-- Logo & Title -->
-                    <div class="text-center mb-4">
-                        <a href="{{ url('/') }}" class="inline-flex items-center space-x-3">
-                            <img src="{{ asset('images/Tesda-Logo.png') }}" alt="TESDA Logo" class="h-12">
-                            <span class="text-2xl font-bold text-gray-800">TESDA Occidental Mindoro</span>
-                        </a>
-                        <p class="mt-2 text-sm text-gray-600">Login to access your account</p>
-                    </div>
-
-                    <!-- Session Status -->
-                    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-
-                        <div>
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="password" :value="__('Password')" />
-                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
-
-                        <div class="block mt-4">
-                            <label for="remember_me" class="inline-flex items-center">
-                                <input id="remember_me" type="checkbox" name="remember"
-                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                                <span class="ml-2 text-sm text-gray-600">Remember me</span>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-between mt-4">
-                            @if (Route::has('password.request'))
-                            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-                                Forgot your password?
+                    </button>
+                    <div id="{{ Str::slug($title) }}-menu"
+                        class="absolute left-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 hidden z-50">
+                        <div class="py-1">
+                            @foreach($links as $link)
+                            <a href="{{ $link['url'] }}" target="{{ $link['target'] ?? '_self' }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                {{ $link['label'] }}
                             </a>
-                            @endif
-                            <x-primary-button>
-                                {{ __('Log in') }}
-                            </x-primary-button>
+                            @endforeach
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Register Modal -->
-            <div id="modal-register" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center overflow-y-auto">
-                <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
-                    <!-- Close button -->
-                    <button onclick="document.getElementById('modal-register').classList.add('hidden');"
-                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
-
-                    <!-- Logo & Title -->
-                    <div class="text-center mb-4">
-                        <a href="{{ url('/') }}" class="inline-flex items-center space-x-3">
-                            <img src="{{ asset('images/Tesda-Logo.png') }}" alt="TESDA Logo" class="h-12">
-                            <span class="text-2xl font-bold text-gray-800">TESDA Occidental Mindoro</span>
-                        </a>
-                        <p class="mt-2 text-sm text-gray-600">Create your TESDA platform account</p>
                     </div>
-
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
-
-                        <div>
-                            <x-input-label for="name" :value="__('Name')" />
-                            <x-text-input id="name"
-                                class="block mt-1 w-full bg-gray-100 border-gray-300 focus:border-indigo-500 focus:bg-white rounded-md shadow-sm"
-                                type="text" name="name" required autofocus />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email"
-                                class="block mt-1 w-full bg-gray-100 border-gray-300 focus:border-indigo-500 focus:bg-white rounded-md shadow-sm"
-                                type="email" name="email" required />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="password" :value="__('Password')" />
-                            <x-text-input id="password"
-                                class="block mt-1 w-full bg-gray-100 border-gray-300 focus:border-indigo-500 focus:bg-white rounded-md shadow-sm"
-                                type="password" name="password" required />
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
-
-                        <div class="mt-4">
-                            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-                            <x-text-input id="password_confirmation"
-                                class="block mt-1 w-full bg-gray-100 border-gray-300 focus:border-indigo-500 focus:bg-white rounded-md shadow-sm"
-                                type="password" name="password_confirmation" required />
-                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-                        </div>
-
-                        <div class="flex items-center justify-between mt-4">
-                            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="#"
-                                onclick="document.getElementById('modal-login').classList.remove('hidden'); document.getElementById('modal-register').classList.add('hidden');">
-                                Already registered?
-                            </a>
-                            <x-primary-button>
-                                {{ __('Register') }}
-                            </x-primary-button>
-                        </div>
-                    </form>
                 </div>
+                @endforeach
+
+                <!-- Verification / Feedback -->
+@guest
+<div x-data="{ verificationOpen: false }" class="relative inline-block text-left">
+    <button @click="verificationOpen = !verificationOpen"
+        class="inline-flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 transition font-semibold focus:outline-none">
+        Verification
+        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                clip-rule="evenodd" />
+        </svg>
+    </button>
+    <div x-show="verificationOpen" x-transition.opacity
+         @click.away="verificationOpen = false"
+         class="absolute left-0 mt-2 w-72 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+        <div class="py-1">
+            @php
+                $verification_links = [
+                    ['url'=>'https://www.example.gov/registry-certified-workers','label'=>'Registry of Certified Workers'],
+                    ['url'=>'https://www.example.gov/assessment-centers','label'=>'Assessment Centers'],
+                    ['url'=>'https://www.example.gov/tvi-registered-programs','label'=>'TVI with Registered Programs'],
+                    ['url'=>'https://www.example.gov/institutions-cease-desist','label'=>'Institutions Issued with Cease and Desist Order'],
+                    ['url'=>'https://www.example.gov/registry-accredited-assessors','label'=>'Registry of Accredited Assessors'],
+                    ['url'=>'https://www.example.gov/registry-trainers-n','label'=>'Registry of Trainers with N'],
+                ];
+            @endphp
+            @foreach($verification_links as $link)
+            <a href="{{ $link['url'] }}" target="_blank"
+               class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+               {{ $link['label'] }}
+            </a>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endguest
+
+
+            <!-- Desktop Auth Buttons -->
+            <div class="hidden sm:flex sm:items-center sm:space-x-2">
+                <button @click="loginModal = true" class="text-sm font-medium text-blue-600 hover:text-blue-800 px-4 py-2 rounded-md transition">
+                    Login
+                </button>
+                <button @click="registerModal = true" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition">
+                    Register
+                </button>
             </div>
 
-
-            <!-- Mobile button -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <!-- Mobile menu button -->
+            <div class="sm:hidden flex items-center">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-blue-600 focus:outline-none transition">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -242,6 +151,91 @@
                     </svg>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden px-2 pt-2 pb-3 space-y-1">
+        <a href="{{ url('/') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
+
+        @foreach($dropdowns as $title => $links)
+        <div x-data="{ openMobile: false }" class="block">
+            <button @click="openMobile = !openMobile" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-between items-center">
+                {{ $title }}
+                <svg :class="{ 'transform rotate-180': openMobile }" class="h-4 w-4 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <div x-show="openMobile" class="pl-4 mt-1 space-y-1">
+                @foreach($links as $link)
+                <a href="{{ $link['url'] }}" target="{{ $link['target'] ?? '_self' }}"
+                    class="block px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    {{ $link['label'] }}
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @endforeach
+
+        @auth
+        <a href="{{ route('user.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Give Feedback</a>
+        @else
+        <button @click="loginModal = true" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Login</button>
+        <button @click="registerModal = true" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700">Register</button>
+        @endauth
+    </div>
+
+    <!-- Login Modal -->
+    <div x-show="loginModal" x-transition.opacity x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div @click.away="loginModal = false" class="bg-white dark:bg-gray-800 rounded-lg w-96 p-6 shadow-lg transition-transform">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Login</h2>
+                <button @click="loginModal = false" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+            </div>
+            <form action="{{ route('login') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Email</label>
+                    <input type="email" name="email" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Password</label>
+                    <input type="password" name="password" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div x-show="registerModal" x-transition.opacity x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div @click.away="registerModal = false" class="bg-white dark:bg-gray-800 rounded-lg w-96 p-6 shadow-lg transition-transform">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Register</h2>
+                <button @click="registerModal = false" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+            </div>
+            <form action="{{ route('register') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Name</label>
+                    <input type="text" name="name" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Email</label>
+                    <input type="email" name="email" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Password</label>
+                    <input type="password" name="password" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-200">Confirm Password</label>
+                    <input type="password" name="password_confirmation" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition">Register</button>
+            </form>
         </div>
     </div>
 </nav>
@@ -541,13 +535,13 @@
 <a href="#" onclick="document.getElementById('modal-structure').classList.remove('hidden'); return false;"
     class="text-blue-600 underline">Open Organizational Structure</a>
 
-<!-- Footer -->
-<footer class="bg-gray-900 text-white py-8 px-6 text-center">
+<!-- Footer -- revised -->
+<!-- <footer class="bg-gray-900 text-white py-8 px-6 text-center">
     <p>&copy; 2025 TESDA Occidental Mindoro. All rights reserved.</p>
     <p>ROMTTAC Compound, Brgy. Santo Niño, Rizal, Occidental Mindoro</p>
-</footer>
+</footer> -->
 
-<!-- Chatbot -->
+<!-- Chatbot revised into modal -->
 <div class="fixed bottom-6 right-6 z-50">
     <button id="chatbot-toggle" class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-full shadow-lg animate-bounce flex items-center gap-2">
         💬 Live Chat TESDA
