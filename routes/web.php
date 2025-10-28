@@ -26,6 +26,14 @@ use App\Http\Controllers\CareerPublicController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\NewsPublicController;
 use App\Models\News;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\TESDAController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Admin\ActivityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,23 +73,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 });
 Route::get('/careers', [CareerPublicController::class, 'index'])->name('careers.public');
 
-Route::get('/', function () {
-    $news = \App\Models\News::latest()->paginate(6); // 6 news per page
-    return view('welcome', compact('news'));
-})->name('welcome');
-
-// Landing page: display news
-Route::get('/', function () {
-    $news = News::latest()->paginate(6);
-    return view('welcome', compact('news'));
-})->name('welcome');
-// Public single news page
-Route::get('/news/{id}', [NewsPublicController::class, 'show'])->name('news.show');
-
-// Admin resource routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('news', NewsController::class);
+    Route::resource('careers', \App\Http\Controllers\Admin\CareerController::class);
 });
+// Admin Dashboard
+Route::get('/admin', function () {
+    return view('admin.index');
+})->name('admin.dashboard');
+// 🏠 Landing page route (displays news and updates)
+Route::get('/', function () {
+    $news = \App\Models\News::latest()->paginate(6);
+    return view('welcome', compact('news'));
+})->name('welcome');
 
 // 📰 Public route to show single news
 Route::get('/news/{id}', [NewsPublicController::class, 'show'])->name('news.show');
@@ -286,6 +289,106 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+//social register 
 
+
+//  Google, Facebook, Yahoo redirect routes
+Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirectToProvider'])
+    ->where('provider', 'google|facebook|yahoo')
+    ->name('social.redirect');
+
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])
+    ->where('provider', 'google|facebook|yahoo')
+    ->name('social.callback');
+
+//drop down profile adin settings
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/profile', [App\Http\Controllers\Admin\AdminController::class, 'profile'])->name('admin.profile');
+    Route::get('/settings', [App\Http\Controllers\Admin\AdminController::class, 'settings'])->name('admin.settings');
+});
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
+});
+
+//nav transparency
+Route::get('/transparency-seal', [App\Http\Controllers\PageController::class, 'transparencySeal'])->name('transparency-seal');
+Route::get('/citizens-charter', [PageController::class, 'citizensCharter'])->name('citizens-charter');
+Route::get('/freedom-of-information', [PageController::class, 'freedomOfInformation'])->name('freedom-of-information');
+Route::get('/bagong-pilipinas', [PageController::class, 'bagongPilipinas'])->name('bagong-pilipinas');
+Route::get('/downloadable-files', [App\Http\Controllers\PageController::class, 'downloadableFiles'])->name('downloadable-files');
+Route::get('/tesda-circulars', [App\Http\Controllers\PageController::class, 'tesdaCirculars'])->name('tesda-circulars');
+Route::get('/tesda-circulars/{year}', [TESDAController::class, 'tesdaCirculars'])->name('tesda.circulars');
+Route::get('/competency-standards-development', [App\Http\Controllers\PageController::class, 'competencyStandards'])
+    ->name('competency-standards');
+
+
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+
+
+
+// Make sure you have auth middleware first
+Route::prefix('admin')->name('admin.')->middleware(['auth'/*, 'isAdmin'*/])->group(function () {
+    
+
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+});
+
+});
+//calendar activities
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(function() {
+    Route::resource('activities', App\Http\Controllers\Admin\ActivityController::class);
+    Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
+});
+
+Route::get('/news', [NewsController::class, 'frontendIndex'])->name('news.index');
+
+    // Banner Routes
+    Route::get('banners', [BannerController::class, 'index'])->name('banners.index');  
+    Route::post('banners', [BannerController::class, 'store'])->name('banners.store');
+    Route::delete('banners/{banner}', [BannerController::class, 'destroy'])->name('banners.destroy');
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/banners', [App\Http\Controllers\Admin\BannerController::class, 'index'])->name('banners.index');
+    Route::post('/banners', [App\Http\Controllers\Admin\BannerController::class, 'store'])->name('banners.store');
+    Route::delete('/banners/{banner}', [App\Http\Controllers\Admin\BannerController::class, 'destroy'])->name('banners.destroy');
+});
+///activities routes
+    Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');  
+    Route::post('activities', [ActivityController::class, 'store'])->name('activities.store');
+    Route::delete('activities/{activities}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/activities', [App\Http\Controllers\Admin\ActivityController::class, 'index'])->name('activities.index');
+    Route::post('/activities', [App\Http\Controllers\Admin\ActivityController::class, 'store'])->name('activities.store');
+    Route::delete('/activities/{activities}', [App\Http\Controllers\Admin\ActivityController::class, 'destroy'])->name('activities.destroy');
+});
+
+
+
+// Home page
+Route::get('/', [LandingController::class, 'index'])->name('welcome');
+
+
+// ✅ FRONTEND NEWS ROUTES
+// FRONTEND NEWS ROUTES
+Route::get('/news', [NewsController::class, 'frontendIndex'])->name('news.frontend.index');
+Route::get('/news/{id}', [NewsController::class, 'frontendShow'])->name('news.frontend.show');
+
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'is_admin'])->group(function () {
+});
 // Auth scaffolding
+
+
+
 require __DIR__ . '/auth.php';

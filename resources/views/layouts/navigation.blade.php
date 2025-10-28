@@ -1,6 +1,5 @@
 <div class="bg-gray-100 dark:bg-gray-900">
 
-    <!-- Okay na sir - so sa welcom nalang ako lalagay ng nav? -->
 
     @if(Auth::user())
     <nav class="flex justify-between items-center bg-gray-200 dark:bg-gray-800 px-4 py-2">

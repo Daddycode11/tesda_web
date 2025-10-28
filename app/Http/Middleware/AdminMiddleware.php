@@ -10,11 +10,10 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        // Assuming your User model has an 'is_admin' column
-        if (Auth::check() && Auth::user()->is_admin) {
+        if (Auth::check() && Auth::user()->is_admin) { // Make sure you have an is_admin column
             return $next($request);
         }
 
-        abort(403, 'Unauthorized'); // or redirect to home
+        abort(403, 'Unauthorized'); // Or redirect somewhere
     }
 }

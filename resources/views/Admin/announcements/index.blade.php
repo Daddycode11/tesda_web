@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-<div x-data="{ showModal: false }" class="flex min-h-screen bg-gray-50">
+<div x-data="{ showModal: false, imagePreview: null }" class="flex min-h-screen bg-gray-50">
     {{-- Sidebar --}}
     @include('components.admin-sidebar')
 
@@ -26,6 +26,7 @@
                 <table class="min-w-full bg-white border rounded-lg overflow-hidden">
                     <thead class="bg-gray-100">
                         <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Image</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Title</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Content</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
@@ -34,6 +35,13 @@
                     <tbody class="divide-y divide-gray-200">
                         @foreach($announcements as $a)
                             <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    @if($a->image)
+                                        <img src="{{ asset('storage/' . $a->image) }}" alt="Announcement Image" class="w-20 h-20 object-cover rounded">
+                                    @else
+                                        <span class="text-gray-400 text-sm">No image</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 text-gray-800">{{ $a->title }}</td>
                                 <td class="px-6 py-4 text-gray-600">{{ \Illuminate\Support\Str::limit($a->content, 50) }}</td>
                                 <td class="px-6 py-4 space-x-2">
@@ -52,7 +60,7 @@
                         @endforeach
                         @if($announcements->isEmpty())
                             <tr>
-                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No announcements available.</td>
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No announcements available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -65,7 +73,7 @@
     <div x-show="showModal" 
          class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
          x-transition
-         style="display: none;">  {{-- Make sure hidden by default --}}
+         style="display: none;">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
 
             <!-- Close button -->
@@ -85,7 +93,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('announcements.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('announcements.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block font-medium">Title:</label>
@@ -94,6 +102,14 @@
                 <div>
                     <label class="block font-medium">Content:</label>
                     <textarea name="content" class="w-full border rounded px-2 py-1" rows="5" required>{{ old('content') }}</textarea>
+                </div>
+                <div>
+                    <label class="block font-medium">Image (optional):</label>
+                    <input type="file" name="image" accept="image/*" 
+                           @change="imagePreview = URL.createObjectURL($event.target.files[0])" class="w-full">
+                    <template x-if="imagePreview">
+                        <img :src="imagePreview" class="mt-2 w-32 h-32 object-cover rounded">
+                    </template>
                 </div>
                 <div class="flex justify-end">
                     <button type="button" @click="showModal = false" class="mr-2 px-4 py-2 rounded border">Cancel</button>

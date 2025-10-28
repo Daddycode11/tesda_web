@@ -5,50 +5,79 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Show the registration form.
+     * Show registration page.
      */
-    public function create(): View
+    public function create()
     {
         return view('auth.register');
     }
 
     /**
-     * Handle a new registration request.
+     * Handle new user registration.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        // Validate form fields
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        try {
+            $request->validate([
+                'name'     => ['required', 'string', 'max:255'],
+                'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'gender'   => ['required', 'in:male,female,other'],
+                'age'      => ['required', 'integer', 'min:1', 'max:120'],
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
 
-        // Create user with default role 'user'
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'user', // ✅ default role
-        ]);
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'gender'   => $request->gender,
+                'age'      => $request->age,
+                'password' => Hash::make($request->password),
+                'role'     => 'user', // Default role
+            ]);
 
-        // Fire Registered event (optional, used for email verification etc.)
-        event(new Registered($user));
+            event(new Registered($user));
+            Auth::login($user);
 
-        // Log the user in immediately
-        Auth::login($user);
+            // ✅ Return success JSON for AJAX
+            if ($request->ajax()) {
+                return response()->json([
+                    'success'  => true,
+                    'message'  => 'Registration successful! Welcome, ' . $user->name . ' 🎉',
+                    'redirect' => '/user',
+                ]);
+            }
 
-        // Redirect new user to /user dashboard
-        return redirect('/user');
+            return redirect('/user');
+
+        } catch (ValidationException $e) {
+            // Handle AJAX validation errors
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors'  => $e->errors(),
+                ], 422);
+            }
+
+            throw $e; // Non-AJAX fallback
+        } catch (\Exception $e) {
+            // Handle unexpected errors (like 500)
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Oops! Something went wrong. Please try again.',
+                ], 500);
+            }
+
+            throw $e; // Non-AJAX fallback
+        }
     }
 }
